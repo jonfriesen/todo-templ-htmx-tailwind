@@ -1,0 +1,63 @@
+package components
+
+import "github.com/jonfriesen/todo-templ-htmx-tailwind/internal/todo"
+import "fmt"
+
+templ Page(todos []todo.TodoItem) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Simple Todo List</title>
+			<script src="https://unpkg.com/htmx.org@1.9.8"></script>
+			<link rel="stylesheet" href="/static/css/main.css?version={{.Version}}"/>
+		</head>
+		<body class="bg-gray-100">
+			<div class="container mx-auto p-8">
+				<div class="max-w-md mx-auto bg-white rounded-lg overflow-hidden md:max-w-lg">
+					<div class="md:flex">
+						<div class="w-full">
+							<div class="p-4 border-b-2">
+								<h2 class="text-2xl font-bold">Todo List</h2>
+							</div>
+							<div class="p-4">
+								<form hx-post="/todo" hx-target="#todo-list" hx-swap="afterbegin" hx-on::after-request="this.reset()">
+									<div class="flex mb-4">
+										<input type="text" name="description" class="shadow appearance-none border rounded w-full py-2 px-3 mr-4 text-grey-darker" placeholder="Add Todo"/>
+										<button type="submit" class="flex-no-shrink p-2 border-2 rounded text-teal border-teal hover:text-white hover:bg-teal">Add</button>
+									</div>
+								</form>
+								@TodoList(todos)
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</body>
+	</html>
+}
+
+templ TodoList(todos []todo.TodoItem) {
+	<div id="todo-list">
+		for _, todo := range todos {
+			@TodoRow(todo)
+		}
+	</div>
+}
+
+templ TodoRow(todoItem todo.TodoItem) {
+	<div id={ todoItem.ID } class="flex mb-4 items-center">
+		<input
+ 			type="checkbox"
+ 			class="mr-2"
+ 			hx-put={ fmt.Sprintf("/todo/%s", todoItem.ID) }
+ 			hx-swap="outerHTML"
+ 			hx-target={ fmt.Sprintf("#%s", todoItem.ID) }
+ 			if todoItem.Complete {
+				checked
+			}
+		/>
+		<p class="w-full text-grey-darker">{ todoItem.Description }</p>
+	</div>
+}
