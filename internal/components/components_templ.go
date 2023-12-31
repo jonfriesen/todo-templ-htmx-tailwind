@@ -10,10 +10,12 @@ import "context"
 import "io"
 import "bytes"
 
-import "github.com/jonfriesen/todo-templ-htmx-tailwind/internal/todo"
-import "fmt"
+import (
+	"fmt"
+	"github.com/jonfriesen/todo-templ-htmx-tailwind/internal/db"
+)
 
-func Page(todos []todo.TodoItem) templ.Component {
+func Page(todos []*db.TodoItem) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -81,7 +83,7 @@ func Page(todos []todo.TodoItem) templ.Component {
 	})
 }
 
-func TodoList(todos []todo.TodoItem) templ.Component {
+func TodoList(todos []*db.TodoItem) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -115,7 +117,7 @@ func TodoList(todos []todo.TodoItem) templ.Component {
 	})
 }
 
-func TodoRow(todoItem todo.TodoItem) templ.Component {
+func TodoRow(todoItem *db.TodoItem) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {

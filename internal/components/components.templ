@@ -1,9 +1,11 @@
 package components
 
-import "github.com/jonfriesen/todo-templ-htmx-tailwind/internal/todo"
-import "fmt"
+import (
+	"fmt"
+	"github.com/jonfriesen/todo-templ-htmx-tailwind/internal/db"
+)
 
-templ Page(todos []todo.TodoItem) {
+templ Page(todos []*db.TodoItem) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -38,7 +40,7 @@ templ Page(todos []todo.TodoItem) {
 	</html>
 }
 
-templ TodoList(todos []todo.TodoItem) {
+templ TodoList(todos []*db.TodoItem) {
 	<div id="todo-list">
 		for _, todo := range todos {
 			@TodoRow(todo)
@@ -46,7 +48,7 @@ templ TodoList(todos []todo.TodoItem) {
 	</div>
 }
 
-templ TodoRow(todoItem todo.TodoItem) {
+templ TodoRow(todoItem *db.TodoItem) {
 	<div id={ todoItem.ID } class="flex mb-4 items-center">
 		<input
  			type="checkbox"

@@ -29,6 +29,42 @@ audit:
 
 
 # ==================================================================================== #
+# DEVELOPMENT
+# ==================================================================================== #
+
+## create-migration: Create a new migration with the specified name. Usage: make create-migration name=<migration_name>
+.PHONY: create-migration
+create-migration:
+	$(eval MIGRATION_NAME=$(filter-out $@,$(MAKECMDGOALS)))
+	@if [ -z "$(MIGRATION_NAME)" ]; then \
+		echo "Usage: make $@ name=<migration_name>"; \
+		exit 1; \
+	fi; \
+	if command -v goose > /dev/null; then \
+		echo "=> creating migration '$(MIGRATION_NAME)'"; \
+		goose -dir=./sql/migrations sqlite3 ./data.db create $(MIGRATION_NAME) sql; \
+	else \
+		echo "=> goose not found"; \
+		echo "=> run make install-dependencies"; \
+	fi
+
+%:
+	@:
+
+	
+## generate-db-code: Generate database code using sqlc. Requires sqlc to be installed.
+.PHONY: generate-db-code
+generate-db-code: install-dependencies
+	@if command -v sqlc > /dev/null; then \
+		echo "=> generating db code"; \
+		sqlc generate; \
+	else \
+		echo "=> sqlc not found"; \
+		echo "=> run dev/install"; \
+	fi
+
+
+# ==================================================================================== #
 # BUILD
 # ==================================================================================== #
 
@@ -43,4 +79,25 @@ build:
 .PHONY: run
 run:
 	go run github.com/cosmtrek/air@v1.40.4 --c="./air.toml"
+
+# ==================================================================================== #
+# DEPENDENCIES
+# ==================================================================================== #
+
+## install-dependencies: Install required tools like sqlc and tern if they are not already installed
+.PHONY: install-dependencies
+install-dependencies:
+	@command -v sqlc > /dev/null || { \
+		echo "=> installing sqlc"; \
+		go install -mod=readonly github.com/sqlc-dev/sqlc/cmd/sqlc@latest; \
+	}
+	@command -v goose > /dev/null || { \
+		echo "=> installing goose"; \
+		go install -mod=readonly  github.com/pressly/goose/v3/cmd/goose@latest; \
+	}
+	@command -v templ > /dev/null || { \
+		echo "=> installing templ"; \
+		go install -mod=readonly  github.com/a-h/templ/cmd/templ@latest; \
+	}
+
 
