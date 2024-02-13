@@ -10,8 +10,20 @@ import (
 
 type TodoItem struct {
 	ID          string       `json:"id"`
+	UserID      string       `json:"user_id"`
 	Description string       `json:"description"`
 	Complete    bool         `json:"complete"`
 	CreatedAt   sql.NullTime `json:"created_at"`
 	CompletedAt interface{}  `json:"completed_at"`
+}
+
+type User struct {
+	ID          string       `json:"id"`
+	Name        string       `json:"name"`
+	Email       string       `json:"email"`
+	Password    string       `json:"password"`
+	CreatedAt   sql.NullTime `json:"created_at"`
+	UpdatedAt   sql.NullTime `json:"updated_at"`
+	DeletedAt   sql.NullTime `json:"deleted_at"`
+	ValidatedAt sql.NullTime `json:"validated_at"`
 }

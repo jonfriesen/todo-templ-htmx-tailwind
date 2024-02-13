@@ -10,9 +10,15 @@ import (
 
 type Querier interface {
 	CompleteTodo(ctx context.Context, id string) error
+	CreateUser(ctx context.Context, arg *CreateUserParams) (*User, error)
+	DeleteUser(ctx context.Context, id string) error
 	GetTodo(ctx context.Context, id string) (*TodoItem, error)
+	GetUserByEmail(ctx context.Context, email string) (*User, error)
+	GetUserByID(ctx context.Context, id string) (*User, error)
 	InsertTodo(ctx context.Context, arg *InsertTodoParams) error
-	ListTodos(ctx context.Context) ([]*TodoItem, error)
+	IsUserValidated(ctx context.Context, id string) (int64, error)
+	ListTodos(ctx context.Context, userID string) ([]*TodoItem, error)
+	UpdateUserPassword(ctx context.Context, arg *UpdateUserPasswordParams) error
 }
 
 var _ Querier = (*Queries)(nil)

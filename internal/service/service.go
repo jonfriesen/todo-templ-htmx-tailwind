@@ -10,7 +10,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gorilla/sessions"
 	"github.com/jonfriesen/todo-templ-htmx-tailwind/internal/todo"
+	"github.com/jonfriesen/todo-templ-htmx-tailwind/internal/user"
 )
 
 const (
@@ -22,10 +24,17 @@ const (
 )
 
 type Application struct {
-	TodoService todo.TodoList
+	Name         string
+	TodoService  todo.TodoList
+	UserService  user.UserService
+	CookieSecret string
+
+	cookieStore *sessions.CookieStore
 }
 
 func (app *Application) ServeHTTP() error {
+	app.cookieStore = sessions.NewCookieStore([]byte(app.CookieSecret))
+
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%d", defaultPort),
 		Handler:      app.routes(),

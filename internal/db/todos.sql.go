@@ -23,7 +23,7 @@ func (q *Queries) CompleteTodo(ctx context.Context, id string) error {
 }
 
 const getTodo = `-- name: GetTodo :one
-SELECT id, description, complete, created_at, completed_at FROM todo_items WHERE id = ?
+SELECT id, user_id, description, complete, created_at, completed_at FROM todo_items WHERE id = ?
 `
 
 func (q *Queries) GetTodo(ctx context.Context, id string) (*TodoItem, error) {
@@ -31,6 +31,7 @@ func (q *Queries) GetTodo(ctx context.Context, id string) (*TodoItem, error) {
 	var i TodoItem
 	err := row.Scan(
 		&i.ID,
+		&i.UserID,
 		&i.Description,
 		&i.Complete,
 		&i.CreatedAt,
@@ -40,27 +41,33 @@ func (q *Queries) GetTodo(ctx context.Context, id string) (*TodoItem, error) {
 }
 
 const insertTodo = `-- name: InsertTodo :exec
-INSERT INTO todo_items (id, description, complete)
-VALUES (?, ?, ?)
+INSERT INTO todo_items (id, user_id, description, complete)
+VALUES (?, ?, ?, ?)
 `
 
 type InsertTodoParams struct {
 	ID          string `json:"id"`
+	UserID      string `json:"user_id"`
 	Description string `json:"description"`
 	Complete    bool   `json:"complete"`
 }
 
 func (q *Queries) InsertTodo(ctx context.Context, arg *InsertTodoParams) error {
-	_, err := q.db.ExecContext(ctx, insertTodo, arg.ID, arg.Description, arg.Complete)
+	_, err := q.db.ExecContext(ctx, insertTodo,
+		arg.ID,
+		arg.UserID,
+		arg.Description,
+		arg.Complete,
+	)
 	return err
 }
 
 const listTodos = `-- name: ListTodos :many
-SELECT id, description, complete, created_at, completed_at FROM todo_items
+SELECT id, user_id, description, complete, created_at, completed_at FROM todo_items WHERE user_id = ?
 `
 
-func (q *Queries) ListTodos(ctx context.Context) ([]*TodoItem, error) {
-	rows, err := q.db.QueryContext(ctx, listTodos)
+func (q *Queries) ListTodos(ctx context.Context, userID string) ([]*TodoItem, error) {
+	rows, err := q.db.QueryContext(ctx, listTodos, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -70,6 +77,7 @@ func (q *Queries) ListTodos(ctx context.Context) ([]*TodoItem, error) {
 		var i TodoItem
 		if err := rows.Scan(
 			&i.ID,
+			&i.UserID,
 			&i.Description,
 			&i.Complete,
 			&i.CreatedAt,

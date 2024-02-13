@@ -12,5 +12,5 @@ CREATE TABLE todo_items (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABOLE todo_items;
+DROP TABLE todo_items;
 -- +goose StatementEnd

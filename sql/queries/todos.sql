@@ -1,9 +1,9 @@
 -- name: ListTodos :many
-SELECT * FROM todo_items;
+SELECT * FROM todo_items WHERE user_id = ?;
 
 -- name: InsertTodo :exec
-INSERT INTO todo_items (id, description, complete)
-VALUES (?, ?, ?);
+INSERT INTO todo_items (id, user_id, description, complete)
+VALUES (?, ?, ?, ?);
 
 -- name: GetTodo :one
 SELECT * FROM todo_items WHERE id = ?;

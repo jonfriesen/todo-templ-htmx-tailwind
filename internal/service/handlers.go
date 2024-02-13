@@ -10,12 +10,25 @@ import (
 )
 
 func (app *Application) home(w http.ResponseWriter, r *http.Request) {
-	items, err := app.TodoService.GetItems(r.Context())
+	components.Index().Render(r.Context(), w)
+}
+
+func (app *Application) todo(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("user_id").(string)
+
+	items, err := app.TodoService.GetItems(r.Context(), userID)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
 	}
-	comp := components.Page(items)
+
+	user, err := app.UserService.GetUserByID(r.Context(), userID)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	comp := components.Page(components.TodoPage(user.Name, items))
 
 	comp.Render(r.Context(), w)
 }
@@ -42,6 +55,8 @@ type newTodo struct {
 }
 
 func (app *Application) addItem(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("user_id").(string)
+
 	var newTodo newTodo
 	err := DecodePostForm(r, &newTodo)
 	if err != nil {
@@ -55,7 +70,7 @@ func (app *Application) addItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	todo, err := app.TodoService.AddItem(r.Context(), &db.TodoItem{Description: newTodo.Description})
+	todo, err := app.TodoService.AddItem(r.Context(), &db.TodoItem{UserID: userID, Description: newTodo.Description})
 	if err != nil {
 		app.serverError(w, r, err)
 		return

@@ -23,6 +23,7 @@ func (t *TodoList) AddItem(ctx context.Context, item *db.TodoItem) (*db.TodoItem
 	item.ID = xid.New().String()
 	t.db.InsertTodo(ctx, &db.InsertTodoParams{
 		ID:          item.ID,
+		UserID:      item.UserID,
 		Description: item.Description,
 		Complete:    item.Complete,
 	})
@@ -34,8 +35,8 @@ func (t *TodoList) AddItem(ctx context.Context, item *db.TodoItem) (*db.TodoItem
 }
 
 // GetItems returns a copy of the list of items.
-func (t *TodoList) GetItems(ctx context.Context) ([]*db.TodoItem, error) {
-	return t.db.ListTodos(ctx)
+func (t *TodoList) GetItems(ctx context.Context, userID string) ([]*db.TodoItem, error) {
+	return t.db.ListTodos(ctx, userID)
 }
 
 // ToggleComplete toggles the completion status of an item.
